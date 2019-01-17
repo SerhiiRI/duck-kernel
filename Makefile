@@ -17,6 +17,8 @@ OBJFILES 	= loader.o \
 						common/memory.o \
 						common/PCI/pci.o \
 						common/devices/keyboard.o \
+						common/stdlib/paging.o \
+						common/stdlib/kernelheap.o \
 						kernel.o
 
 all: kernel.bin

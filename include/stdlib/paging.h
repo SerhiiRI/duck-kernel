@@ -25,12 +25,15 @@ typedef struct page_table_struct
 } page_table;
 
 
-typdef struct page_directory_struct
+typedef struct page_directory_struct
 {
-  /**
+  /**z
      Array of pointer to pagetables;
    **/
   page_table *tables[1024];
+  /**
+     The physical address of tablesPhysical.This comes into play
+  **/
   /**
      Array of pointers to the pagetables above, but gives their *physical*
      location, for loading into the CR3 register.
@@ -44,6 +47,8 @@ typdef struct page_directory_struct
   u32 physicalAddr;
 }page_directory;
 
+
+
 /**
    Sets up the invironment, page directories etc and
    enables pagging.
@@ -54,20 +59,20 @@ void initialise_paging();
    Couses the specified page direcotry to be loaded into the
    CR3 register.
 **/
-void switch_page_direcotory(page_directory_t *new);
+void switch_page_direcotory(page_directory *new);
 
 /**
    Retrieves a pointer ot the page required.
    if make == 1, if the page-table in which this page should
    reside isn't created, create it!
 **/
-page_t *get_page(u32 address, int make, page_directory_t *dir);
+page *get_page(u32 address, int make, page_directory *dir);
 
 
 /**
    Handler for page faults
 **/
-void page_fault(registers_table regs)
+void page_fault(registers_table regs);
 
 
 #endif

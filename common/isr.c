@@ -26,6 +26,19 @@ void isr_handler(registers_table regs)
 
 }
 
+
+void isr_error_handler(registers_table regs)
+{
+  printf("recieved interrupt: %d | error code: %d\n"
+         , regs.interruption_number
+         , regs.error_code);
+  if (interrupt_handlers[regs.error_code] != 0)
+    {
+      isr_t handler = interrupt_handlers[regs.error_code];
+      handler(regs);
+    }
+}
+
 void irq_handler(registers_table regs)
 {
   /* Send an EOI (end of interrupt) signal to the PICs. */

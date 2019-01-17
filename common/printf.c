@@ -600,3 +600,12 @@ vsnprintf (char *str, size_t size, const char *format, va_list ap)
 /* } */
 
 /* INITFUNC ("global0", printf_init_global); */
+
+
+extern void panic(const char *message, const char *file, u32 line)
+{
+  // We encountered a massive problem and have to stop.
+  asm volatile("cli"); // Disable interrupts.
+  printf("PANIC( %s ) , at %s:%d)", message, file, line);
+  for(;;);
+}

@@ -110,6 +110,7 @@ IRQ  15,    47
 
 ; In isr.c
 extern isr_handler
+extern isr_error_handler
 extern irq_handler
 
 
@@ -127,7 +128,7 @@ isr_common_stub:
 
 isr_error_common_stub:
   SAVE_CPU_REGISTERS
-  call isr_handler
+  call isr_error_handler
   RESTORE_CPU_REGISTERS
   add esp, 8     ; Cleans up the pushed error code and pushed ISR number from ESP stack
   sti

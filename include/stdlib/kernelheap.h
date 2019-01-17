@@ -17,4 +17,5 @@ u32 kmalloc_p(u32 sz, u32 *phys);
 /* page aligned and returns */
 /* a physical address       */
 u32 kmalloc_ap(u32 sz, u32 *phys);
+
 #endif
