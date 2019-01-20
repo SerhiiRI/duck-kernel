@@ -6,6 +6,7 @@
 #include "descriptor_tables.h"
 #include "dev/keyboard.h"
 #include "stdlib/paging.h"
+#include "stdlib/kernelheap.h"
 
 
 void main(void)
@@ -30,10 +31,10 @@ void main(void)
   /* asm volatile("int $0x3"); */
   /* asm volatile("int $0x4"); */
 
-  asm volatile("int $0x8");
-  asm volatile("int $0xA");
-  asm volatile("int $0xB");
-  asm volatile("int $0xC");
+  /* asm volatile("int $0x8"); */
+  /* asm volatile("int $0xA"); */
+  /* asm volatile("int $0xB"); */
+  /* asm volatile("int $0xC"); */
   /* asm volatile("int $0xD"); */
   /* asm volatile("int $0xE"); */
   asm volatile("sti");
@@ -42,6 +43,16 @@ void main(void)
   initialise_paging();
   printf("hello, paging world!\n");
 
+
+  u32 a = kmalloc(8);
+  u32 b = kmalloc(8);
+  u32 c = kmalloc(8);
+
+  printf("A:%X\nB:%X\nC:%X\n", a, b, c);
+  kfree(c);
+  kfree(b);
+  u32 d = kmalloc(12);
+  printf("D:%X\n",d);
   /* Symulation, page fault */
   /* u32 *ptr = (u32*)0xA0000000; */
   /* u32 do_fault = *ptr; */

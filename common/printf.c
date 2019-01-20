@@ -609,3 +609,13 @@ extern void panic(const char *message, const char *file, u32 line)
   printf("PANIC( %s ) , at %s:%d)", message, file, line);
   for(;;);
 }
+
+
+extern void panic_assert(const char *file, u32 line, const char *desc)
+{
+  // An assertion failed, and we have to panic.
+  asm volatile("cli"); // Disable interrupts.
+  printf("ASSERTION-FAILED( %X at %s:%d\n", desc, file, line);
+  // Halt by going into an infinite loop.
+  for(;;);
+}

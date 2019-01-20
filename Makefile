@@ -19,6 +19,7 @@ OBJFILES 	= loader.o \
 						common/devices/keyboard.o \
 						common/stdlib/paging.o \
 						common/stdlib/kernelheap.o \
+						common/stdlib/ordered_array.o \
 						kernel.o
 
 all: kernel.bin

@@ -29,9 +29,11 @@ void isr_handler(registers_table regs)
 
 void isr_error_handler(registers_table regs)
 {
-  printf("recieved interrupt: %d | error code: %d\n"
-         , regs.interruption_number
-         , regs.error_code);
+  if (regs.error_code == 0x0E){
+    // TODO create page fautl descritptions
+    printf("error code: %d\n", regs.error_code);
+  }else
+    printf("error code: %d\n", regs.error_code);
   if (interrupt_handlers[regs.error_code] != 0)
     {
       isr_t handler = interrupt_handlers[regs.error_code];
