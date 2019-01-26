@@ -117,12 +117,13 @@ void initialise_paging(){
   frames = (u32*)kmalloc(INDEX_FROM_BIT(number_of_frames));             /*  */
   memset(frames, 0, INDEX_FROM_BIT(number_of_frames));
 
+  u32 phys;
   kernel_directory = (page_directory*)kmalloc_a(sizeof(page_directory));
   memset(kernel_directory, 0 , sizeof(page_directory));
-  current_directory = kernel_directory;
+  kernel_directory->physicalAddr = (u32) kernel_directory->tablesPhysical;
 
   // Map some pages in the kernel heap area.
-  // Here we call get_page but not alloc_frame. This causes page_table_t's 
+  // Here we call get_page but not alloc_frame. This causes page_table_t's
   // to be created where necessary. We can't allocate frames yet because they
   // they need to be identity mapped first below, and yet we can't increase
   // placement_address between identity mapping and enabling the heap!
@@ -147,20 +148,21 @@ void initialise_paging(){
   for (i = KHEAP_START; i < KHEAP_START+KHEAP_INITIAL_SIZE; i += 0x1000)
     alloc_frame( get_page(i, 1, kernel_directory), 0, 0);
 
-
   register_interrupt_handler(14, page_fault);
   switch_page_directory(kernel_directory);
   kheap = create_heap(KHEAP_START, KHEAP_START+KHEAP_INITIAL_SIZE, 0xCFFFF000, 0, 0);
+  current_directory = clone_directory(kernel_directory);
+  switch_page_directory(current_directory);
 }
 
 
 void switch_page_directory (page_directory * dir)
 {
   current_directory = dir;
-  asm volatile("mov %0, %%cr3" :: "r"(&dir->tablesPhysical));
+  asm volatile("mov %0, %%cr3" :: "r"(dir->physicalAddr));
   u32 cr0;
   asm volatile("mov %%cr0, %0": "=r"(cr0));
-  cr0 |= 0x80000001;
+  cr0 |= 0x80000000;
   asm volatile("mov %0, %%cr0" :: "r"(cr0));
 }
 
@@ -190,6 +192,7 @@ page *get_page(u32 address, int make, page_directory *dir)
 }
 
 
+
 void page_fault(registers_table regs)
 {
   /* a page fautl has occured. */
@@ -213,9 +216,57 @@ void page_fault(registers_table regs)
   PANIC("Page fault");
 }
 
+static page_table *clone_table(page_table *original, u32 * physAddr)
+{
+  page_table * table = (page_table*)kmalloc_ap(sizeof(page_table), physAddr);
+  memset (table, 0, sizeof(page_table));
 
-/* void page_fault(registers_table regs) */
-/* { */
-/*   /\* a page fautl has occured. *\/ */
-/*   printf("CHUJNIA"); */
-/* } */
+  int i;
+  for (i = 0; i < 1024; i++)
+    {
+      if(!original->pages[i].frame)
+        {
+          alloc_frame(&table->pages[i], 0, 0);
+          if(original->pages[i].present)   table->pages[i].present = 1;
+          if(original->pages[i].rw)        table->pages[i].rw = 1;
+          if(original->pages[i].user)      table->pages[i].user = 1;
+          if(original->pages[i].accessed)  table->pages[i].accessed = 1;
+          if(original->pages[i].dirty)     table->pages[i].dirty = 1;
+          copy_page_physical(original->pages[i].frame * 0x1000, table->pages[i].frame*0x1000);
+        }
+    }
+  return table;
+}
+
+
+page_directory * clone_directory(page_directory *original)
+{
+  u32 phys;
+  page_directory * dir = (page_directory *)kmalloc_ap(sizeof(page_directory), &phys);
+  memset(dir, 0, sizeof(page_directory));
+
+
+  u32 offset = (u32)dir->tablesPhysical  - (u32)dir;
+  dir->physicalAddr = phys + offset;
+
+  int i;
+  for (i = 0; i< 1024; i++)
+    {
+      if(!original->tables[i])
+        continue;
+
+      if(kernel_directory->tables[i] == original->tables[i])
+        {
+          dir->tables[i]          = original->tables[i];
+          dir->tablesPhysical[i]  = original->tablesPhysical[i];
+        }
+      else
+        {
+          u32 phys;
+          dir->tables[i]          = clone_table(original->tables[i], &phys);
+          dir->tablesPhysical[i]  = phys | 0x07;
+        }
+    }
+  return dir;
+}
+

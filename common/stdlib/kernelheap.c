@@ -18,7 +18,7 @@ u32 kmalloc_internal(u32 size, int align, u32 *phys){
       if (phys != 0)
         {
           page *temp_page = get_page((u32)addr, 0, kernel_directory);
-          *phys = temp_page->frame*0x1000 + (u32)addr&0xFFF;
+          *phys = temp_page->frame*0x1000 + ((u32)addr & 0xFFF);
         }
       return (u32)addr;
     }

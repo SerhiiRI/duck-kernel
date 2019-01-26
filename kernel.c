@@ -1,20 +1,20 @@
-
-
+#include "multiboot.h"
 #include "printf.h"
 #include "screen.h"
 #include "types.h"
+#include "stdlib/task.h"
 #include "descriptor_tables.h"
 #include "dev/keyboard.h"
 #include "stdlib/paging.h"
 #include "stdlib/kernelheap.h"
 
 
-void main(void)
+u32 stack_esp;
+
+void main(struct multiboot * header, u32 stack_pointer)
 {
-
+  stack_esp = stack_pointer;
   initialize_descriptor_tables();
-  /* PCIScan(); */
-
 	clear_screen();
 
   printf("\n                   +-----------------+\n");
@@ -26,37 +26,17 @@ void main(void)
   printf("  `~j-'\n");
   printf("    \"=:)\n");
   printf("\n");
-  /* PCIScan(); */
-
-  /* asm volatile("int $0x3"); */
-  /* asm volatile("int $0x4"); */
-
-  /* asm volatile("int $0x8"); */
-  /* asm volatile("int $0xA"); */
-  /* asm volatile("int $0xB"); */
-  /* asm volatile("int $0xC"); */
-  /* asm volatile("int $0xD"); */
-  /* asm volatile("int $0xE"); */
+  PCIScan();
   asm volatile("sti");
-  /* init_keyboard(); */
-
+  init_keyboard();
+  initialise_timer(50);
   initialise_paging();
-  printf("hello, paging world!\n");
+  initialise_tasking();
 
+  int ret = fork();
 
-  u32 a = kmalloc(8);
-  u32 b = kmalloc(8);
-  u32 c = kmalloc(8);
-
-  printf("A:%X\nB:%X\nC:%X\n", a, b, c);
-  kfree(c);
-  kfree(b);
-  u32 d = kmalloc(12);
-  printf("D:%X\n",d);
-  /* Symulation, page fault */
-  /* u32 *ptr = (u32*)0xA0000000; */
-  /* u32 do_fault = *ptr; */
-
+  printf("RET -> %X | PID -> %X\n", ret, get_pid());
+  printf("Thread function");
 
 }
 

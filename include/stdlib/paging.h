@@ -47,8 +47,6 @@ typedef struct page_directory_struct
   u32 physicalAddr;
 }page_directory;
 
-
-
 /**
    Sets up the invironment, page directories etc and
    enables pagging.
@@ -75,4 +73,13 @@ page *get_page(u32 address, int make, page_directory *dir);
 void page_fault(registers_table regs);
 
 
+/**
+   copy directory
+**/
+page_directory * clone_directory(page_directory *dir);
+
+/**
+   alocation page frame
+**/
+void alloc_frame(page *page, int is_kernel, int is_writeable);
 #endif
