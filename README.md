@@ -12,6 +12,6 @@
  - JamesM's kernel development tutorials
  - oszur11 source code
  - BeOS hypervisor
- - _Yamiko7x_ for logo
+ - _Yamiko7x_ for logo design
  
 
