@@ -15,7 +15,7 @@
 #define PCI_HEADERTYPE_CARDBUS       2
 #define PCI_HEADERTYPE_MULTIFUNC     0x80
 
-typedef union 
+typedef union
 {
 	struct
 	{

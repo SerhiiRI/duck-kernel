@@ -5,7 +5,7 @@ LDFLAGS = -m elf_i386
 AS  		= nasm
 ASFLAGS	= -felf
 
-OBJFILES 	= loader.o \
+ OBJFILES 	= loader.o \
 						common/printf.o \
 						common/screen.o	\
 						common/interrupt.o \

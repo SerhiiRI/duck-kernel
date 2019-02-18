@@ -37,7 +37,7 @@ static void cons_putc(int c)
         }
       break;
     case '\b':
-      if (curr_col > 0) 
+      if (curr_col > 0)
         {
           curr_col -= 1;
           PUT(' ');
@@ -57,18 +57,12 @@ static void cons_putc(int c)
         }
     };
 }
-
-
 void putchar( int c )
 {
-  if (c == '\n') 
+  if (c == '\n')
     cons_putc('\r');
   cons_putc(c);
 }
-
-
-
-
 void clear_screen( void )
 {
   curr_col = 0;

@@ -27,7 +27,7 @@ typedef struct page_table_struct
 
 typedef struct page_directory_struct
 {
-  /**z
+  /**
      Array of pointer to pagetables;
    **/
   page_table *tables[1024];

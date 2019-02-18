@@ -68,18 +68,6 @@ static void init_GDT()
   set_GDT_gate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF); /* User mode code segment */
   set_GDT_gate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); /* User mode data segment */
   gdt_flush((u32)&pointer_to_GDT);
-  /* __asm__ volatile ("lgdt %0" */
-  /*                   : */
-  /*                   : "m" (pointer_to_GDT)); */
-
-  /* asm("   movw $0x10, %ax    \n \ */
-  /*           movw %ax, %ds    \n \ */
-  /*           movw %ax, %es    \n \ */
-  /*           movw %ax, %fs    \n \ */
-  /*           movw %ax, %gs    \n \ */
-  /*           ljmp $0x08, $next    \n \ */
-  /*           next:        \n"); */
-  //reloadSegments();
 
 }
 
@@ -171,9 +159,6 @@ static void init_IDT()
   set_IDT_gate(47, (u32)irq15, 0x08, 0x8E);
 
   idt_flush((u32) &pointer_to_IDT);
-  /* __asm__ volatile ("lidt %0" */
-  /*                   : */
-  /*                   : "m" (pointer_to_IDT)); */
 }
 
 

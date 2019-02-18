@@ -23,7 +23,6 @@ void isr_handler(registers_table regs)
       handler(regs);
     }
 
-
 }
 
 

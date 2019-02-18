@@ -1,15 +1,43 @@
+/*
+ * Copyright (c) 2007, 2008 University of Tsukuba
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 3. Neither the name of the University of Tsukuba nor the names of its
+ *    contributors may be used to endorse or promote products derived from
+ *    this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
 #include "types.h"
 #include "printf.h"
-#include "IO/io.h"
+#include "memory.h"
 #include "IO/pci.h"
 
-typedef struct 
+typedef struct
 {
 	u32 class_code;
 	char name[32];
 } PCIClassName;
 
-static PCIClassName g_PCIClassNames[] = 
+static PCIClassName g_PCIClassNames[] =
 {
 	{ 0x00, "before PCI 2.0"},
 	{ 0x01, "disk controller"},
@@ -50,13 +78,13 @@ typedef union
 void ReadConfig32(u32 bus, u32 dev, u32 func, u32 reg, u32 *data)
 {
 	PCIConfigAddres addr;
-	
+
 	addr.val = 0;
 	addr.enable_bit = 1;
 	addr.reg_num =  reg;
 	addr.func_num = func;
 	addr.dev_num =  dev;
-	addr.bus_num =  bus;		
+	addr.bus_num =  bus;
 
 	out32(PCI_CONFIG_PORT, addr.val);
 	in32(PCI_DATA_PORT, data);
@@ -77,32 +105,32 @@ char *GetPCIDevClassName(u32 class_code)
 int ReadPCIDevHeader(u32 bus, u32 dev, u32 func, PCIDevHeader *p_pciDevice)
 {
 	int i;
-	
+
 	if (p_pciDevice == 0)
 		return 1;
-	
+
 	for (i = 0; i < sizeof(p_pciDevice->header)/sizeof(p_pciDevice->header[0]); i++)
 		ReadConfig32(bus, dev, func, i, &p_pciDevice->header[i]);
-		
-	if (p_pciDevice->option.vendorID == 0x0000 || 
+
+	if (p_pciDevice->option.vendorID == 0x0000 ||
 		p_pciDevice->option.vendorID == 0xffff ||
 		p_pciDevice->option.deviceID == 0xffff)
 		return 1;
-		
+
 	return 0;
 }
 
 void PrintPCIDevHeader(u32 bus, u32 dev, u32 func, PCIDevHeader *p_pciDevice)
 {
 	char *class_name;
-	
+
 	printf("bus=0x%x dev=0x%x func=0x%x venID=0x%x devID=0x%x",
 			bus, dev, func, p_pciDevice->option.vendorID, p_pciDevice->option.deviceID);
-			
+
 	class_name = GetPCIDevClassName(p_pciDevice->option.classCode);
 	if (class_name)
 		printf(" class_name=%s", class_name);
-		
+
 	printf("\n");
 }
 
@@ -110,18 +138,18 @@ void PCIScan(void)
 {
 	int bus;
 	int dev;
-	
+
 	for (bus = 0; bus < PCI_MAX_BUSES; bus++)
 		for (dev = 0; dev < PCI_MAX_DEVICES; dev++)
 		{
 			u32 func = 0;
 			PCIDevHeader pci_device;
-			
+
 			if (ReadPCIDevHeader(bus, dev, func, &pci_device))
 				continue;
-				
+
 			PrintPCIDevHeader(bus, dev, func, &pci_device);
-			
+
 			if (pci_device.option.headerType & PCI_HEADERTYPE_MULTIFUNC)
 			{
 				for (func = 1; func < PCI_MAX_FUNCTIONS; func++)

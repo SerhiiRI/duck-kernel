@@ -26,15 +26,15 @@ void main(struct multiboot * header, u32 stack_pointer)
   printf("  `~j-'\n");
   printf("    \"=:)\n");
   printf("\n");
-  PCIScan();
+  //PCIScan();
   asm volatile("sti");
   init_keyboard();
-  initialise_timer(50);
+  //initialise_timer(50);
   initialise_paging();
   initialise_tasking();
 
   int ret = fork();
-
+  task_switch();
   printf("RET -> %X | PID -> %X\n", ret, get_pid());
   printf("Thread function");
 

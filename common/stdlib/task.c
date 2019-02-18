@@ -13,8 +13,7 @@ volatile task_t *ready_queue;
 
 extern page_directory *kernel_directory;
 extern page_directory *current_directory;
-extern void alloc_frame(page *
-                        , int , int);
+extern void alloc_frame(page * , int , int);
 extern u32 stack_esp;
 extern u32 read_eip();
 
@@ -98,8 +97,8 @@ void task_switch()
     return;
 
   u32 esp, ebp, eip;
-  asm volatile("mov %%ebp, %0": "=r"(ebp));
   asm volatile("mov %%esp, %0": "=r"(esp));
+  asm volatile("mov %%ebp, %0": "=r"(ebp));
   eip = read_eip();
 
   /* have we just switch tasks? */

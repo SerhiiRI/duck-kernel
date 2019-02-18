@@ -177,7 +177,7 @@ static unsigned long long sub16[] = {
 	0x0ULL,
 };
 
-/* static spinlock_t printf_lock; */
+
 
 static int
 parse_format (const char **format, int *width, int *precision)
@@ -428,8 +428,7 @@ error:
 }
 
 static int
-do_printf (const char *format, va_list ap, int (*func)(int c, void *data),
-	   void *data)
+do_printf (const char *format, va_list ap, int (*func)(int c, void *data), void *data)
 {
 	char c;
 	int n, f;
@@ -562,9 +561,7 @@ vprintf (const char *format, va_list ap)
 {
 	int r;
 
-	/* spinlock_lock (&printf_lock); */
 	r = do_printf (format, ap, do_putchar, NULL);
-	/* spinlock_unlock (&printf_lock); */
 	return r;
 }
 
@@ -593,14 +590,6 @@ vsnprintf (char *str, size_t size, const char *format, va_list ap)
 	return r;
 }
 
-/* static void */
-/* printf_init_global (void) */
-/* { */
-/* 	spinlock_init (&printf_lock); */
-/* } */
-
-/* INITFUNC ("global0", printf_init_global); */
-
 
 extern void panic(const char *message, const char *file, u32 line)
 {
@@ -618,4 +607,5 @@ extern void panic_assert(const char *file, u32 line, const char *desc)
   printf("ASSERTION-FAILED( %X at %s:%d\n", desc, file, line);
   // Halt by going into an infinite loop.
   for(;;);
+
 }

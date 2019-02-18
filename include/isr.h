@@ -30,7 +30,7 @@ struct registers
 typedef struct registers registers_table;
 
 
-typedef void (*isr_t)(registers_t);
+typedef void (*isr_t)(registers_table);
 void register_interrupt_handler(u8 n, isr_t handler);
 
 #endif
