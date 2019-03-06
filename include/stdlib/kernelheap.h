@@ -17,6 +17,7 @@ typedef struct
   u32   magic;
   u8    is_hole;
   u32   size;
+
 } header_t;
 
 typedef struct
@@ -59,5 +60,6 @@ void * alloc(u32 size, u8 page_align, heap_t * heap);
 void free(void *p, heap_t * heap);
 
 void kfree(void *p);
-
+void print_memory_statistics(heap_t*);
+void print_kernel_heap_statistics();
 #endif

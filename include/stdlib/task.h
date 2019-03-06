@@ -24,4 +24,5 @@ void move_stack(void * stack_pointer, u32 stack_size);
 /* return PID of current process */
 int get_pid();
 
+void print_task_info();
 #endif

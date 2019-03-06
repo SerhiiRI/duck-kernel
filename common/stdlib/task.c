@@ -49,6 +49,36 @@ void initialise_tasking()
   asm volatile("sti");
 }
 
+void print_task_info()
+{
+  task_t * temp_task = (task_t*)ready_queue;
+
+  printf("\n===================================[ TASKS ]====================================PID\t\tESP\t\tEBP\t\tEIP\t\tPage directory\n");
+  while(temp_task != 0)
+    {
+      if(temp_task->esp == 0){
+      printf("  %d\t   %s\t     %s\t     %s\t\t  0x%X\n",
+             temp_task->id,
+             "UNDEFINED",
+             "UNDEFINED",
+             "UNDEFINED",
+             temp_task->directory
+             );
+      }else{
+      printf("  %d\t   0x%X\t     0x%X\t     0x%X\t\t  0x%X\n",
+             temp_task->id,
+             temp_task->esp,
+             temp_task->ebp,
+             temp_task->eip,
+             temp_task->directory
+             );
+      }
+      temp_task = temp_task->next;
+    }
+  printf("================================================================================");
+}
+
+
 int fork()
 {
   asm volatile ("cli");
@@ -105,9 +135,10 @@ void task_switch()
   if(eip == 0x12345)
     return;
 
+  current_task->eip   = eip;
   current_task->esp   = esp;
   current_task->ebp   = ebp;
-  current_task->eip   = eip;
+
 
   /* if end of list reload queue to start */
   current_task        = current_task->next;
@@ -130,7 +161,6 @@ void task_switch()
      jmp *%%ecx           "
                : : "r"(eip), "r"(esp), "r"(ebp), "r"(current_directory->physicalAddr));
 }
-
 
 void move_stack(void * stack_pointer, u32 stack_size)
 {
@@ -155,7 +185,7 @@ void move_stack(void * stack_pointer, u32 stack_size)
   u32 offset = (u32)stack_pointer - stack_esp;
 
   u32 new_stack_pointer = old_stack_pointer + offset;
-  u32 new_base_pointer = old_base_pointer + offset;
+  u32 new_base_pointer  = old_base_pointer + offset;
 
   /* just copy old stack */
   memcpy((void*)new_stack_pointer, (void*)old_stack_pointer, stack_esp-old_stack_pointer);
@@ -178,3 +208,4 @@ void move_stack(void * stack_pointer, u32 stack_size)
   asm volatile("mov %0, %%esp" : : "r" (new_stack_pointer));
   asm volatile("mov %0, %%ebp" : : "r" (new_base_pointer));
 }
+

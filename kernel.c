@@ -16,7 +16,6 @@ void main(struct multiboot * header, u32 stack_pointer)
   stack_esp = stack_pointer;
   initialize_descriptor_tables();
 	clear_screen();
-
   printf("\n                   +-----------------+\n");
   printf("      ,~~.         |     KWA         |\n");
   printf("     (  9 )-_,    <        -KWA!     | \n");
@@ -26,17 +25,25 @@ void main(struct multiboot * header, u32 stack_pointer)
   printf("  `~j-'\n");
   printf("    \"=:)\n");
   printf("\n");
-  //PCIScan();
-  asm volatile("sti");
-  init_keyboard();
-  //initialise_timer(50);
-  initialise_paging();
-  initialise_tasking();
+  clear_screen();
+  printf("[+] Scanning PCI\n");
+  PCIScan();
 
+  printf("[+] keyboard initialization\n");
+  init_keyboard();
+  asm volatile("sti");
+  printf("[+] memory initialization.\n");
+  initialise_paging();
+  printf("[+] timer initialization\n");
+  printf("[+] tasking initialization\n");
+
+
+
+  initialise_timer(50);
+  initialise_tasking();
   int ret = fork();
-  task_switch();
-  printf("RET -> %X | PID -> %X\n", ret, get_pid());
-  printf("Thread function");
+  //task_switch();
+  print_task_info();
 
 }
 

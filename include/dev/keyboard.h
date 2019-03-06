@@ -7,4 +7,5 @@
 
 void init_keyboard();
 
+char get_keyboard_buffor();
 #endif

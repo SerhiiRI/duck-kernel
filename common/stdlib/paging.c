@@ -151,10 +151,35 @@ void initialise_paging(){
   register_interrupt_handler(14, page_fault);
   switch_page_directory(kernel_directory);
   kheap = create_heap(KHEAP_START, KHEAP_START+KHEAP_INITIAL_SIZE, 0xCFFFF000, 0, 0);
+  //print_memory_statistics(kheap);
   current_directory = clone_directory(kernel_directory);
   switch_page_directory(current_directory);
 }
 
+void print_memory_statistics(heap_t * tempheap){
+  printf("\tHEAP:\n \t\tSTART: %X\n \t\tEND:  %X\n \t\tholes/blocks header:\n",  tempheap->start_address, tempheap->end_address);
+  int counter;
+  for(counter = 0; counter <=(((ordered_array_t)(tempheap->index)).size) -1; counter++){
+  printf("\t\t\t%d:\n\t\t\t  Magic:%X\n \t\t\t  Is Hole: %X\n \t\t\t  Size: %X\n",
+         counter,
+         ((header_t*)(((ordered_array_t)(tempheap->index)).array[counter]))->magic,
+         ((header_t*)(((ordered_array_t)(tempheap->index)).array[counter]))->is_hole,
+         ((header_t*)(((ordered_array_t)(tempheap->index)).array[counter]))->size);
+  }
+}
+
+void print_kernel_heap_statistics(){
+  printf("\tHEAP:\n \t\tSTART: %X\n \t\tEND:   %X\n \t\tholes/blocks header:\n",  kheap->start_address, kheap->end_address);
+  int counter;
+  for(counter = 0; counter <=(((ordered_array_t)(kheap->index)).size) -1; counter++){
+    printf("\t\t\t%d block in address %X \n\t\t\t  Magic:%X  Is Hole: %X  Size: %X\n",
+           counter,
+           ((u32)(((ordered_array_t)(kheap->index)).array[counter])), 
+           ((header_t*)(((ordered_array_t)(kheap->index)).array[counter]))->magic,
+           ((header_t*)(((ordered_array_t)(kheap->index)).array[counter]))->is_hole,
+           ((header_t*)(((ordered_array_t)(kheap->index)).array[counter]))->size);
+  }
+}
 
 void switch_page_directory (page_directory * dir)
 {

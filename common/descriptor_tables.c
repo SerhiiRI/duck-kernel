@@ -32,6 +32,7 @@ void store_idt_desc(idt_pointer *  location) {
 
 void initialize_descriptor_tables()
 {
+  clear_screen();
   gdt_pointer desc;
   store_gdt_desc(&desc);
   printf("[BEFORE] GDT base: 0x%X, limit: 0x%X\n", desc.base, desc.limit);

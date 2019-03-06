@@ -4,9 +4,15 @@
 #include "dev/keyboard.h"
 #include "dev/scan_codes.h"
 
+char oneSymbolBuffor = 0;
 
+static void write_to_buffor(char code){
+  oneSymbolBuffor = code;
+}
 
-
+char get_keyboard_buffor(){
+  return oneSymbolBuffor;
+}
 
 static void keyboard_press_callback(registers_table regs)
 {
@@ -26,7 +32,7 @@ static void keyboard_press_callback(registers_table regs)
 			printf("\n");
       return;
 		}
-
+    write_to_buffor(keycode);
     printf("%c", keyboard_codes[keycode]);
 	}
 }
@@ -34,5 +40,5 @@ static void keyboard_press_callback(registers_table regs)
 void init_keyboard()
 {
   register_interrupt_handler(IRQ1, &keyboard_press_callback);
-  printf("Initialize keyboard\n");
+  //printf("Initialize keyboard\n");
 }

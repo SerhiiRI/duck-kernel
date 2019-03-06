@@ -56,4 +56,3 @@ kernel.bin: $(OBJFILES)
 
 clean:
 				@rm -f $(OBJFILES)
-				@rm kernel.bin kernel.bin.gdb
